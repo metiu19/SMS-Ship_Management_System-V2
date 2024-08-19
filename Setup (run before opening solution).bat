@@ -8,6 +8,7 @@ rmdir GameBinaries > nul 2>&1
 mklink /J GameBinaries "%path%"
 if errorlevel 1 goto Error
 echo Done!
+goto EndFinal
 
 :Error
 echo An error occured creating the symlink.

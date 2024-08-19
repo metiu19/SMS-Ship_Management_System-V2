@@ -26,4 +26,6 @@
       <AdditionalFiles Include="Instructions.readme" />
     </ItemGroup>
 
+    <Import Project="..\..\..\Scripts\ScriptUtils\ScriptUtils.projitems" Label="Shared" />
+
 </Project>

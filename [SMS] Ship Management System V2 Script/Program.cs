@@ -22,51 +22,155 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        // This file contains your actual script.
-        //
-        // You can either keep all your code here, or you can create separate
-        // code files to make your program easier to navigate while coding.
-        //
-        // Go to:
-        // https://github.com/malware-dev/MDK-SE/wiki/Quick-Introduction-to-Space-Engineers-Ingame-Scripts
-        //
-        // to learn more about ingame scripts.
+        public readonly string Title = "[SMS]";
+        public readonly string Version = "V2.0.0";
+
+        public ScreenLogger Logger { get; }
+        public SMSErrorsManager ErrsMngr { get; }
+        public MyIni PBConfigs { get; } = new MyIni();
+        public bool VerboseLogs { get; }
+
+        private const UpdateType _argCall = UpdateType.Terminal | UpdateType.Trigger | UpdateType.Mod | UpdateType.Script;
+        private bool _inited = false;
+        private readonly List<string> _requiredSections = new List<string>() { "SMS" };
+        private readonly ScreenManager _mainScreen;
+        private readonly List<IModule> _modules = new List<IModule>();
 
         public Program()
         {
-            // The constructor, called only once every session and
-            // always before any other method is called. Use it to
-            // initialize your script. 
-            //     
-            // The constructor is optional and can be removed if not
-            // needed.
-            // 
-            // It's recommended to set Runtime.UpdateFrequency 
-            // here, which will allow your script to run itself without a 
-            // timer block.
+            // Init Errors Manager
+            ErrsMngr = new SMSErrorsManager(this);
+
+            // Init Logs Screen
+            IMyTextSurfaceProvider logsLCD = GridTerminalSystem.GetBlockWithName("SMS Logs LCD") as IMyTextSurfaceProvider;
+            Logger = new ScreenLogger(this, "Logs", logsLCD, 0);
+            Logger.LogInfo("Script Init Starting");
+
+            // Parse PB Custom Data
+            Logger.LogInfo("Loading configs");
+            MyIniParseResult iniParseRes;
+            if (!PBConfigs.TryParse(Me.CustomData, out iniParseRes))
+            {
+                Logger.LogCritical("Could not parse PB Custom Data");
+                ErrsMngr.AddIniParseError(Me.CustomName, iniParseRes);
+                ErrsMngr.PrintErrorsAndThrowException("Could not parse PB Custom Data");
+            }
+
+            // Check for missing sections
+            List<string> sections = new List<string>();
+            PBConfigs.GetSections(sections);
+            List<string> missingSections = _requiredSections.Except(sections).ToList();
+            if (missingSections.Count() != 0)
+            {
+                Logger.LogCritical("Missing required section/s check errors screen");
+                ErrsMngr.AddConfigMissingError("Missing required section/s in PB Custom Data");
+                missingSections.ForEach(ms => ErrsMngr.AddIniMissingSection(Me.CustomName, ms));
+                ErrsMngr.PrintErrorsAndThrowException("Missing required section/s in configs");
+            }
+            sections.RemoveAll(s => new HashSet<string>(_requiredSections).Contains(s));
+
+            // Set Global configs
+            VerboseLogs = PBConfigs.Get("SMS", "Verbose").ToBoolean();
+
+            // Config Main Display
+            Logger.LogInfo("Main Screen Init");
+            string mainScreenName = PBConfigs.Get("SMS", "MainLCD").ToString();
+            if (mainScreenName == "")
+            {
+                Logger.LogCritical("Could not find the name of the main display");
+                ErrsMngr.AddIniMissingKey(Me.CustomName, "SMS", "MainLCD");
+                ErrsMngr.AddErrorDescription("Could not find the name of the main display");
+                ErrsMngr.PrintErrorsAndThrowException("Main LCD not found");
+            }
+            int mainScreenIndex = PBConfigs.Get("SMS", "MainScreenIndex").ToInt32();
+
+            IMyTextSurfaceProvider mainScreen = GridTerminalSystem.GetBlockWithName(mainScreenName) as IMyTextSurfaceProvider;
+            if (mainScreen == null)
+            {
+                Logger.LogCritical("Main LCD not found");
+                ErrsMngr.AddBlockNotFoundError(mainScreenName);
+                ErrsMngr.AddErrorDescription("Main LCD not found");
+                ErrsMngr.PrintErrorsAndThrowException("Main LCD not found");
+            }
+
+            _mainScreen = new ScreenManager(this, "Main Screen", mainScreen, mainScreenIndex);
+            _mainScreen.AppendLine("\nBooting Up   [---------------------------]");
+
+
+            // Load Modules
+            Logger.LogInfo("Seraching Modules");
+            _mainScreen.AppendLine("Loading Modules");
+            foreach (var section in sections)
+            {
+                Logger.LogInfo($"Found module '{section}'");
+
+                string terminalName = PBConfigs.Get(section, "Terminal Name").ToString();
+                if (terminalName == "")
+                {
+                    ErrsMngr.AddIniMissingKey(Me.CustomName, section, "TerminalName");
+                    continue;
+                }
+
+                string type = PBConfigs.Get(section, "Type").ToString();
+                if (type == "")
+                {
+                    ErrsMngr.AddIniMissingKey(Me.CustomName, section, "Type");
+                    continue;
+                }
+
+                string subtype = PBConfigs.Get(section, "Subtype").ToString();
+                if (subtype == "")
+                {
+                    ErrsMngr.AddIniMissingKey(Me.CustomName, section, "Subtype");
+                    continue;
+                }
+
+                IModule module = ModuleFactory.CreateModule(this, section, terminalName, type, subtype);
+                if (module != null)
+                    _modules.Add(module);
+            }
+            ErrsMngr.PrintErrors();
+            Logger.LogInfo($"{_modules.Count}/{sections.Count} modules registered");
+
+            Runtime.UpdateFrequency = UpdateFrequency.Update100 | UpdateFrequency.Update10;
+            Logger.LogInfo("Script Init Finished");
         }
 
         public void Save()
         {
-            // Called when the program needs to save its state. Use
-            // this method to save your state to the Storage field
-            // or some other means. 
-            // 
-            // This method is optional and can be removed if not
-            // needed.
         }
 
         public void Main(string argument, UpdateType updateSource)
         {
-            // The main entry point of the script, invoked every time
-            // one of the programmable block's Run actions are invoked,
-            // or the script updates itself. The updateSource argument
-            // describes where the update came from. Be aware that the
-            // updateSource is a  bitfield  and might contain more than 
-            // one update type.
-            // 
-            // The method itself is required, but the arguments above
-            // can be removed if not needed.
+            if (!_inited)
+                Init();
+
+            if ((updateSource & UpdateType.Update10) > 0)
+            {
+                CheckModules();
+            }
+
+            if ((updateSource & UpdateType.Update100) > 0)
+                _mainScreen.ClearScreen();
+
+            if ((updateSource & _argCall) > 0)
+            {
+                Echo(argument);
+            }
+        }
+
+        private void Init()
+        {
+            _inited = true;
+            Logger.LogInfo("Modules Init Started");
+            _modules.ForEach(module => module.Init());
+            Logger.LogInfo("Modules Init Finished");
+            ErrsMngr.PrintErrors();
+        }
+
+        private void CheckModules()
+        {
+            _modules.ForEach(module => module.CheckState());
         }
     }
 }
