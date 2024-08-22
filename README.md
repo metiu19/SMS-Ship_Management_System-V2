@@ -18,3 +18,70 @@ This scripts aims to improve realism by making possible to simulate block's subs
 ## How to update the submodule
 
 If a new version of the submodule will be required by this project then use the following command to pull both this repo and the submodule: `git pull --recurse-submodules`
+
+
+# To-Do List
+
+## First Relase
+- [ ] Streamline (As Much As Possible) and Manage INI Config
+- [ ] Add Block Tag support
+- [ ] Multi Tick System Init
+- [ ] Develop Property Management
+- [ ] Develop Parse and Action Management by Topic
+- [ ] Develop Storage Logger System
+
+## UI Interface
+- [ ] Develop INI Generator for Display Panel and Set
+- [ ] Agree and develop communication standards between the two PBs
+- [ ] Develop Parse and Action Management by IGC
+- [ ] Receive Commands From Interface
+- [ ] Response of Results to Interface
+
+## Features
+- [ ] Develop Subtypes System
+- [ ] Develop Property with Numeric Value
+- [ ] Develop Threshold Acceleration System
+- [ ] Remote Tamper Management
+
+
+# Module Cocept
+```mermaid
+%%{ init : { "theme" : "dark", "flowchart" : { "curve" : "linear" }}}%%
+flowchart RL
+    subgraph STANDARD
+        direction RL
+        subgraph IModuleType
+            direction TB
+            A1(TYPE)-->A2[[BLOCK]]
+            A1-->A3[[GROUP]]
+            A1-->A4[[TYPE]]
+        end
+        subgraph IModule
+            direction TB
+            B1[MODULE]
+        end
+        subgraph Property
+            direction TB
+            C1[PROPERTIES] --> C2[/ACTIONS/]
+            C2 --> C3[UP]
+            C2 --> C4[DOWN]
+        end
+    end
+    subgraph OPTIONAL
+        direction TB
+        subgraph IModuleSubType
+            direction TB
+            D1(SUBTYPE)-->D2[[GENERIC]]
+            D1(SUBTYPE)-->D3[[CUSTOM]]
+        end
+    end
+    IModule ===> IModuleType
+    Property ===> IModule
+    IModule ===> IModuleSubType
+
+    style IModule fill:#000,stroke:#0000ff ,stroke-width:4px
+    style IModuleType fill:#000,stroke:#00ff00 ,stroke-width:4px
+    style Property fill:#000,stroke:#8800aa ,stroke-width:4px
+    style IModuleSubType fill:#000,stroke:#ffff00, stroke-width:4px
+    style OPTIONAL fill:transparent,stroke:#ffff00,stroke-width:4px,stroke-dasharray: 5 5
+```
