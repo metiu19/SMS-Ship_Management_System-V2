@@ -19,6 +19,7 @@ This scripts aims to improve realism by making possible to simulate block's subs
 
 If a new version of the submodule will be required by this project then use the following command to pull both this repo and the submodule: `git pull --recurse-submodules`
 
+---
 
 # To-Do List
 
@@ -44,7 +45,7 @@ If a new version of the submodule will be required by this project then use the 
 - [ ] Remote Tamper Management
 
 
-# Module Cocept
+# Module Concept
 ```mermaid
 %%{ init : { "theme" : "dark", "flowchart" : { "curve" : "linear" }}}%%
 flowchart RL
@@ -54,34 +55,33 @@ flowchart RL
             direction TB
             A1(TYPE)-->A2[[BLOCK]]
             A1-->A3[[GROUP]]
-            A1-->A4[[TYPE]]
         end
         subgraph IModule
             direction TB
             B1[MODULE]
         end
-        subgraph Property
+        subgraph Subsystem
             direction TB
-            C1[PROPERTIES] --> C2[/ACTIONS/]
+            C1[SUBSYSTEMS] --> C2[/ACTIONS/]
             C2 --> C3[UP]
             C2 --> C4[DOWN]
         end
     end
     subgraph OPTIONAL
         direction TB
-        subgraph IModuleSubType
+        subgraph ModuleSubtype
             direction TB
             D1(SUBTYPE)-->D2[[GENERIC]]
             D1(SUBTYPE)-->D3[[CUSTOM]]
         end
     end
-    IModule ===> IModuleType
-    Property ===> IModule
-    IModule ===> IModuleSubType
+    IModuleType ===> IModule
+    Subsystem ===> IModule
+    ModuleSubtype ===> IModule
 
     style IModule fill:#000,stroke:#0000ff ,stroke-width:4px
     style IModuleType fill:#000,stroke:#00ff00 ,stroke-width:4px
-    style Property fill:#000,stroke:#8800aa ,stroke-width:4px
-    style IModuleSubType fill:#000,stroke:#ffff00, stroke-width:4px
+    style Subsystem fill:#000,stroke:#8800aa ,stroke-width:4px
+    style ModuleSubtype fill:#000,stroke:#ffff00, stroke-width:4px
     style OPTIONAL fill:transparent,stroke:#ffff00,stroke-width:4px,stroke-dasharray: 5 5
 ```
