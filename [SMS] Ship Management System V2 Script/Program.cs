@@ -33,7 +33,6 @@ namespace IngameScript
         private const UpdateType _argCall = UpdateType.Terminal | UpdateType.Trigger | UpdateType.Mod | UpdateType.Script;
         private bool _inited = false;
         private readonly List<string> _requiredSections = new List<string>() { "SMS" };
-        private readonly ScreenManager _mainScreen;
         private readonly List<IModule> _modules = new List<IModule>();
 
         public Program()
@@ -72,34 +71,8 @@ namespace IngameScript
             // Set Global configs
             VerboseLogs = PBConfigs.Get("SMS", "Verbose").ToBoolean();
 
-            // Config Main Display
-            Logger.LogInfo("Main Screen Init");
-            string mainScreenName = PBConfigs.Get("SMS", "MainLCD").ToString();
-            if (mainScreenName == "")
-            {
-                Logger.LogCritical("Could not find the name of the main display");
-                ErrsMngr.AddIniMissingKey(Me.CustomName, "SMS", "MainLCD");
-                ErrsMngr.AddErrorDescription("Could not find the name of the main display");
-                ErrsMngr.PrintErrorsAndThrowException("Main LCD not found");
-            }
-            int mainScreenIndex = PBConfigs.Get("SMS", "MainScreenIndex").ToInt32();
-
-            IMyTextSurfaceProvider mainScreen = GridTerminalSystem.GetBlockWithName(mainScreenName) as IMyTextSurfaceProvider;
-            if (mainScreen == null)
-            {
-                Logger.LogCritical("Main LCD not found");
-                ErrsMngr.AddBlockNotFoundError(mainScreenName);
-                ErrsMngr.AddErrorDescription("Main LCD not found");
-                ErrsMngr.PrintErrorsAndThrowException("Main LCD not found");
-            }
-
-            _mainScreen = new ScreenManager(this, "Main Screen", mainScreen, mainScreenIndex);
-            _mainScreen.AppendLine("\nBooting Up   [---------------------------]");
-
-
             // Load Modules
             Logger.LogInfo("Seraching Modules");
-            _mainScreen.AppendLine("Loading Modules");
             foreach (var section in sections)
             {
                 Logger.LogInfo($"Found module '{section}'");
@@ -132,7 +105,7 @@ namespace IngameScript
             ErrsMngr.PrintErrors();
             Logger.LogInfo($"{_modules.Count}/{sections.Count} modules registered");
 
-            Runtime.UpdateFrequency = UpdateFrequency.Update100 | UpdateFrequency.Update10;
+            //Runtime.UpdateFrequency = UpdateFrequency.Update10;
             Logger.LogInfo("Script Init Finished");
         }
 
@@ -149,9 +122,6 @@ namespace IngameScript
             {
                 CheckModules();
             }
-
-            if ((updateSource & UpdateType.Update100) > 0)
-                _mainScreen.ClearScreen();
 
             if ((updateSource & _argCall) > 0)
             {

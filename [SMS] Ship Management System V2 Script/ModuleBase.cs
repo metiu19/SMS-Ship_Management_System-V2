@@ -32,7 +32,7 @@ namespace IngameScript
             private bool _defaultState;
             private bool _supportStandby;
             private double _cooldownDelay;
-            private List<Property> _properties;
+            private List<Subsystem> _subsystems;
 
             public string Id { get; }
             public bool IsReady { get; private set; } = false;

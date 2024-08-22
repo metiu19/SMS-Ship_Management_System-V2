@@ -22,7 +22,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public struct Property
+        public struct Subsystem
         {
             public readonly string Name;
             public readonly float StopDelay;
@@ -30,7 +30,7 @@ namespace IngameScript
             public readonly bool DefaultState;
             public bool Enabled;
 
-            public Property(string name, float startDelay, float stopDelay, bool defualtState = false)
+            public Subsystem(string name, float startDelay, float stopDelay, bool defualtState = false)
             {
                 Name = name;
                 StartDelay = startDelay;
