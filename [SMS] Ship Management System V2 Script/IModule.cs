@@ -29,13 +29,6 @@ namespace IngameScript
             void ForceState(bool state);
         }
 
-        public enum ModuleSubtype
-        {
-            Generic,
-            Test,
-            Invalid
-        }
-
         public interface IModule
         {
             string Id { get; }

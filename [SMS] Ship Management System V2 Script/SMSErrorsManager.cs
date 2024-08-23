@@ -52,6 +52,9 @@ namespace IngameScript
 
             public void AddModuleSubtypeNotImplementedError(ModuleSubtype subtype) =>
                 RegisterError($"[ERR_SMS_MDL_STY_NIMP] Module subtype '{subtype}' not implemented yet");
+
+            public void AddTagBlocksNotFoundError(string tag) =>
+                RegisterError($"[ERR_SMS_TAG_BLK_404] Couldn't find any block or group with given tag '{tag}'");
         }
     }
 }

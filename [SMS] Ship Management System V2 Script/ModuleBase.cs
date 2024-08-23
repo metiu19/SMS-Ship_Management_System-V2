@@ -81,11 +81,11 @@ namespace IngameScript
                     return 1;
                 }
 
-                // Properties
-                string props = _configs.Get(Id, "Properties").ToString();
+                // Subsystems
+                string props = _configs.Get(Id, "Subsystems").ToString();
                 if (props == "")
                 {
-                    _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Properties");
+                    _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Subsystems");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return 1;
                 }

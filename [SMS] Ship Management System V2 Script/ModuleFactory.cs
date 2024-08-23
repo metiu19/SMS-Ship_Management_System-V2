@@ -24,57 +24,62 @@ namespace IngameScript
     {
         public class ModuleFactory
         {
-            public static IModule CreateModule(Program program, string id, string terminalName, string type, string subtypeString)
+            public static IModule CreateModule(Program program, string id, string terminalName, ModuleTypes? type, string subtypeString)
             {
                 IModuleType moduleType;
                 ModuleSubtype subtype;
                 if (!Enum.TryParse(subtypeString, out subtype))
                 {
-                    program.Logger.LogError($"Module '{id}' subtype invalid");
+                    program.Logger.LogError("Subtype invalid");
                     program.ErrsMngr.AddModuleSubtypeInvalidError(id);
                     return null;
                 }
 
                 // Type
-                switch (type.ToLower())
+                switch (type)
                 {
-                    case "block":
-                        program.Logger.LogInfo("Module Type: Block");
-                        IMyFunctionalBlock block = program.GridTerminalSystem.GetBlockWithName(terminalName) as IMyFunctionalBlock;
-                        if (block == null)
-                        {
-                            program.Logger.LogError($"Block '{terminalName}' not found for module '{id}'");
-                            program.ErrsMngr.AddBlockNotFoundError(terminalName);
-                            program.ErrsMngr.AddErrorDescription($"Module '{id}'");
+                    case ModuleTypes.Block:
+                        program.Logger.LogInfo("Type: Terminal Block");
+                        if (!TryCreateTypeBlock(program, id, terminalName, out moduleType))
                             return null;
-                        }
-                        moduleType = new ModuleTypeBlock(block);
                         break;
 
-                    case "group":
-                        program.Logger.LogInfo("Module Type: Group");
-                        IMyBlockGroup group = program.GridTerminalSystem.GetBlockGroupWithName(terminalName);
-                        if (group == null)
+                    case ModuleTypes.Group:
+                        program.Logger.LogInfo("Type: Terminal Group");
+                        if (!TryCreateTypeGroup(program, id, terminalName, out moduleType))
+                            return null;
+                        break;
+
+                    case ModuleTypes.Tag:
+                        var blockMachets = program.Blocks.Where(b => b.CustomName.Contains(terminalName)).ToList();
+                        if (blockMachets.Count() == 1)  // Block
                         {
-                            program.Logger.LogError($"Group '{terminalName}' not found for module '{id}'");
-                            program.ErrsMngr.AddGroupNotFoundError(terminalName);
+                            program.Logger.LogInfo("Type: Terminal Block");
+                            if (!TryCreateTypeBlock(program, id, terminalName, out moduleType))
+                                return null;
+                        }
+                        else if (blockMachets.Count() > 1) // Blocks Group
+                        {
+                            program.Logger.LogInfo("Type: SMS Group");
+                            moduleType = new ModuleTypeGroup(blockMachets);
+                        }
+                        else if (program.Groups.Any(g => g.Name.Contains(terminalName)))  // Terminal Group
+                        {
+                            program.Logger.LogInfo("Type: Terminal Group");
+                            if (!TryCreateTypeGroup(program, id, terminalName, out moduleType))
+                                return null;
+                        }
+                        else    // Not Found
+                        {
+                            program.Logger.LogError("No block/s or group with tag found");
+                            program.ErrsMngr.AddTagBlocksNotFoundError(terminalName);
                             program.ErrsMngr.AddErrorDescription($"Module '{id}'");
                             return null;
                         }
-                        List<IMyFunctionalBlock> blocks = new List<IMyFunctionalBlock>();
-                        group.GetBlocksOfType(blocks);
-                        if (blocks.Count == 0)
-                        {
-                            program.Logger.LogError($"Group '{terminalName}' doesn't have any supported block");
-                            program.ErrsMngr.AddGroupNoSupportedError(terminalName);
-                            program.ErrsMngr.AddErrorDescription($"Module '{id}'");
-                            return null;
-                        }
-                        moduleType = new ModuleTypeGroup(blocks);
                         break;
 
                     default:
-                        program.Logger.LogError($"Module '{id}' type invalid");
+                        program.Logger.LogError("Type invalid");
                         program.ErrsMngr.AddModuleTypeInvalidError(id);
                         return null;
                 }
@@ -84,7 +89,7 @@ namespace IngameScript
                 MyIniParseResult res;
                 if (!moduleConfigs.TryParse(program.Me.CustomData, id, out res))
                 {
-                    program.Logger.LogError($"Could not parse module '{id}' settings");
+                    program.Logger.LogError($"Could not parse module settings");
                     program.ErrsMngr.AddIniParseError(terminalName, res);
                     return null;
                 }
@@ -93,16 +98,59 @@ namespace IngameScript
                 switch (subtype)
                 {
                     case ModuleSubtype.Generic:
-                        program.Logger.LogInfo("Module Subtype: Generic");
+                        program.Logger.LogInfo("Subtype: Generic");
                         return new ModuleBase(program, id, moduleType, subtype, moduleConfigs);
 
                     default:
-                        program.Logger.LogError($"Module Subtype '{subtype}' not implemented yet");
+                        program.Logger.LogError($"Subtype '{subtype}' not implemented yet");
                         program.ErrsMngr.AddModuleSubtypeNotImplementedError(subtype);
                         break;
                 }
 
                 return null;
+            }
+
+            private static bool TryCreateTypeBlock(Program program, string moduleId, string blockName, out IModuleType moduleType)
+            {
+                moduleType = null;
+
+                IMyFunctionalBlock block = program.Blocks.FirstOrDefault(b => b.CustomName.Contains(blockName));
+                if (block == null || !block.IsSameConstructAs(program.Me))
+                {
+                    program.Logger.LogError($"Block '{blockName}' not found");
+                    program.ErrsMngr.AddBlockNotFoundError(blockName);
+                    program.ErrsMngr.AddErrorDescription($"Module '{moduleId}'");
+                    return false;
+                }
+
+                moduleType = new ModuleTypeBlock(block);
+                return true;
+            }
+
+            private static bool TryCreateTypeGroup(Program program, string moduleId, string groupName, out IModuleType moduleType)
+            {
+                moduleType = null;
+
+                IMyBlockGroup group = program.Groups.Find(g => g.Name.Contains(groupName));
+                if (group == null)
+                {
+                    program.Logger.LogError($"Group '{groupName}' not found");
+                    program.ErrsMngr.AddGroupNotFoundError(groupName);
+                    program.ErrsMngr.AddErrorDescription($"Module '{moduleId}'");
+                    return false;
+                }
+                List<IMyFunctionalBlock> blocks = new List<IMyFunctionalBlock>();
+                group.GetBlocksOfType(blocks, b => b.IsSameConstructAs(program.Me));
+                if (blocks.Count == 0)
+                {
+                    program.Logger.LogError($"Group '{groupName}' doesn't have any supported blocks");
+                    program.ErrsMngr.AddGroupNoSupportedError(groupName);
+                    program.ErrsMngr.AddErrorDescription($"Module '{moduleId}'");
+                    return false;
+                }
+
+                moduleType = new ModuleTypeGroup(blocks);
+                return true;
             }
         }
     }

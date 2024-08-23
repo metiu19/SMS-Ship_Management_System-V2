@@ -25,6 +25,8 @@ namespace IngameScript
         public readonly string Title = "[SMS]";
         public readonly string Version = "V2.0.0";
 
+        public List<IMyBlockGroup> Groups { get; } = new List<IMyBlockGroup>();
+        public HashSet<IMyFunctionalBlock> Blocks { get; } = new HashSet<IMyFunctionalBlock>();
         public ScreenLogger Logger { get; }
         public SMSErrorsManager ErrsMngr { get; }
         public MyIni PBConfigs { get; } = new MyIni();
@@ -44,6 +46,23 @@ namespace IngameScript
             IMyTextSurfaceProvider logsLCD = GridTerminalSystem.GetBlockWithName("SMS Logs LCD") as IMyTextSurfaceProvider;
             Logger = new ScreenLogger(this, "Logs", logsLCD, 0);
             Logger.LogInfo("Script Init Starting");
+
+            // Fill Groups & Blocks
+            GridTerminalSystem.GetBlockGroups(Groups);
+            Logger.LogInfo($"Groups Length {Groups.Count}");
+            List<IMyFunctionalBlock> blocks = new List<IMyFunctionalBlock>();
+            Groups.RemoveAll(g =>
+            {
+                blocks.Clear();
+                g.GetBlocksOfType(blocks, b => b.IsSameConstructAs(Me));
+                return blocks.Count == 0;
+            });
+            Logger.LogInfo($"Groups Length {Groups.Count}");
+
+            blocks.Clear();
+            GridTerminalSystem.GetBlocksOfType(blocks, b => b.IsSameConstructAs(Me));
+            Blocks = blocks.ToHashSet();
+            Logger.LogInfo($"Blocks Lenght {Blocks.Count}");
 
             // Parse PB Custom Data
             Logger.LogInfo("Loading configs");
@@ -73,32 +92,47 @@ namespace IngameScript
 
             // Load Modules
             Logger.LogInfo("Seraching Modules");
-            foreach (var section in sections)
+            foreach (string moduleId in sections)
             {
-                Logger.LogInfo($"Found module '{section}'");
+                Logger.LogInfo($"Found module '{moduleId}'");
 
-                string terminalName = PBConfigs.Get(section, "Terminal Name").ToString();
-                if (terminalName == "")
+                string tName = PBConfigs.Get(moduleId, "Terminal Name").ToString();
+                string tGroup = PBConfigs.Get(moduleId, "Terminal Group").ToString();
+                string tTag = PBConfigs.Get(moduleId, "Terminal Tag").ToString();
+                string terminalName;
+                ModuleTypes type;
+                if (tName != "" && tGroup == "" && tTag == "")
                 {
-                    ErrsMngr.AddIniMissingKey(Me.CustomName, section, "TerminalName");
+                    terminalName = tName;
+                    type = ModuleTypes.Block;
+                }
+                else if (tName == "" && tGroup != "" && tTag == "")
+                {
+                    terminalName = tGroup;
+                    type = ModuleTypes.Group;
+                }
+                else if (tName == "" && tGroup == "" && tTag != "")
+                {
+                    terminalName = tTag;
+                    type = ModuleTypes.Tag;
+                }
+                else
+                {
+                    Logger.LogError("Multiple or none types specified");
+                    ErrsMngr.AddModuleTypeInvalidError(moduleId);
                     continue;
                 }
 
-                string type = PBConfigs.Get(section, "Type").ToString();
-                if (type == "")
-                {
-                    ErrsMngr.AddIniMissingKey(Me.CustomName, section, "Type");
-                    continue;
-                }
 
-                string subtype = PBConfigs.Get(section, "Subtype").ToString();
+                string subtype = PBConfigs.Get(moduleId, "Subtype").ToString();
                 if (subtype == "")
                 {
-                    ErrsMngr.AddIniMissingKey(Me.CustomName, section, "Subtype");
+                    Logger.LogError("Subtype not found");
+                    ErrsMngr.AddIniMissingKey(Me.CustomName, moduleId, "Subtype");
                     continue;
                 }
 
-                IModule module = ModuleFactory.CreateModule(this, section, terminalName, type, subtype);
+                IModule module = ModuleFactory.CreateModule(this, moduleId, terminalName, type, subtype);
                 if (module != null)
                     _modules.Add(module);
             }

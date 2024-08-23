@@ -22,6 +22,13 @@ namespace IngameScript
 {
     partial class Program
     {
+        public enum ModuleTypes
+        {
+            Block,
+            Group,
+            Tag
+        }
+
         public class ModuleTypeBlock : IModuleType
         {
             private readonly IMyFunctionalBlock _block;

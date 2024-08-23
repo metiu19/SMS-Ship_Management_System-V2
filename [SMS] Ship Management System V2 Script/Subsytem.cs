@@ -22,6 +22,13 @@ namespace IngameScript
 {
     partial class Program
     {
+        public enum ModuleSubtype
+        {
+            Generic,
+            Test,
+            Invalid
+        }
+
         public struct Subsystem
         {
             public readonly string Name;
