@@ -25,7 +25,7 @@ If a new version of the submodule will be required by this project then use the 
 
 ## First Relase
 - [ ] Streamline (As Much As Possible) and Manage INI Config
-- [ ] Add Block Tag support
+- [x] Add Block Tag support
 - [ ] Multi Tick System Init
 - [ ] Develop Property Management
 - [ ] Develop Parse and Action Management by Topic
@@ -45,43 +45,5 @@ If a new version of the submodule will be required by this project then use the 
 - [ ] Remote Tamper Management
 
 
-# Module Concept
-```mermaid
-%%{ init : { "theme" : "dark", "flowchart" : { "curve" : "linear" }}}%%
-flowchart RL
-    subgraph STANDARD
-        direction RL
-        subgraph IModuleType
-            direction TB
-            A1(TYPE)-->A2[[BLOCK]]
-            A1-->A3[[GROUP]]
-        end
-        subgraph IModule
-            direction TB
-            B1[MODULE]
-        end
-        subgraph Subsystem
-            direction TB
-            C1[SUBSYSTEMS] --> C2[/ACTIONS/]
-            C2 --> C3[UP]
-            C2 --> C4[DOWN]
-        end
-    end
-    subgraph OPTIONAL
-        direction TB
-        subgraph ModuleSubtype
-            direction TB
-            D1(SUBTYPE)-->D2[[GENERIC]]
-            D1(SUBTYPE)-->D3[[CUSTOM]]
-        end
-    end
-    IModuleType ===> IModule
-    Subsystem ===> IModule
-    ModuleSubtype ===> IModule
-
-    style IModule fill:#000,stroke:#0000ff ,stroke-width:4px
-    style IModuleType fill:#000,stroke:#00ff00 ,stroke-width:4px
-    style Subsystem fill:#000,stroke:#8800aa ,stroke-width:4px
-    style ModuleSubtype fill:#000,stroke:#ffff00, stroke-width:4px
-    style OPTIONAL fill:transparent,stroke:#ffff00,stroke-width:4px,stroke-dasharray: 5 5
-```
+# Design Board
+The live Design Board can be found at this [link](https://www.tldraw.com/ro/nBqbZP4eXDWeXMTsVC5Kq?v=229,24,1287,705&p=ci27OQnnbh8zHCzljSsPH)
