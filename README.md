@@ -46,4 +46,4 @@ If a new version of the submodule will be required by this project then use the 
 
 
 # Design Board
-The live Design Board can be found at this [link](https://www.tldraw.com/ro/nBqbZP4eXDWeXMTsVC5Kq?v=229,24,1287,705&p=ci27OQnnbh8zHCzljSsPH)
+The live Design Board can be found at this [link](https://www.tldraw.com/ro/dP5dSsz9P3M5qiZGDzCyl?v=-9,-20,1920,1052&p=JESMoZBO6S0kI4gtO4vbP)
