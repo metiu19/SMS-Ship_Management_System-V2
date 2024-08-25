@@ -22,6 +22,13 @@ namespace IngameScript
 {
     partial class Program
     {
+        public enum ModuleSubtype
+        {
+            Generic,
+            Test,
+            Invalid
+        }
+
         public class TestModule : ModuleBase
         {
             public string Yes { get; } = "Hello World!";
