@@ -45,11 +45,11 @@ namespace IngameScript
             // Init Logs Screen
             IMyTextSurfaceProvider logsLCD = GridTerminalSystem.GetBlockWithName("SMS Logs LCD") as IMyTextSurfaceProvider;
             Logger = new ScreenLogger(this, "Logs", logsLCD, 0);
+            Logger.Debug = true;
             Logger.LogInfo("Script Init Starting");
 
             // Fill Groups & Blocks
             GridTerminalSystem.GetBlockGroups(Groups);
-            Logger.LogInfo($"Groups Length {Groups.Count}");
             List<IMyFunctionalBlock> blocks = new List<IMyFunctionalBlock>();
             Groups.RemoveAll(g =>
             {
@@ -57,12 +57,12 @@ namespace IngameScript
                 g.GetBlocksOfType(blocks, b => b.IsSameConstructAs(Me));
                 return blocks.Count == 0;
             });
-            Logger.LogInfo($"Groups Length {Groups.Count}");
+            Logger.LogDebug($"Groups Length {Groups.Count}");
 
             blocks.Clear();
             GridTerminalSystem.GetBlocksOfType(blocks, b => b.IsSameConstructAs(Me));
             Blocks = blocks.ToHashSet();
-            Logger.LogInfo($"Blocks Lenght {Blocks.Count}");
+            Logger.LogDebug($"Blocks Lenght {Blocks.Count}");
 
             // Parse PB Custom Data
             Logger.LogInfo("Loading configs");
@@ -86,9 +86,6 @@ namespace IngameScript
                 ErrsMngr.PrintErrorsAndThrowException("Missing required section/s in configs");
             }
             sections.RemoveAll(s => new HashSet<string>(_requiredSections).Contains(s));
-
-            // Set Global configs
-            VerboseLogs = PBConfigs.Get("SMS", "Verbose").ToBoolean();
 
             // Load Modules
             Logger.LogInfo("Seraching Modules");
