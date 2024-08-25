@@ -85,7 +85,7 @@ namespace IngameScript
 
                 // Subsystems
                 string[] subsystems = _configs.Get(Id, "Subsystems").ToString().Split('\n');
-                if (subsystems.Length == 0)
+                if (subsystems[0] == "")
                 {
                     _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Subsystems");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
