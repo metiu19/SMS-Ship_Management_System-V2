@@ -32,7 +32,7 @@ namespace IngameScript
             private bool _defaultState;
             private bool _supportStandby;
             private double _cooldownDelay;
-            private List<Subsystem> _subsystems;
+            private List<Subsystem> _subsystems = new List<Subsystem>();
 
             public string Id { get; }
             public bool IsReady { get; private set; } = false;
@@ -63,14 +63,15 @@ namespace IngameScript
                     State = ModuleState.Online;
                 else
                     State = ModuleState.Offline;
+                _logger.LogDebug($"Default State = {State}");
 
                 // Custom Name
                 Name = _configs.Get(Id, "Name").ToString(Id);
-                _logger.LogInfo($"Module '{Id}' aka '{Name}'");
+                _logger.LogDebug($"Name = '{Name}'");
 
                 // Standby
                 _supportStandby = _configs.Get(Id, "Standby").ToBoolean();
-                _logger.LogInfo($"Module '{Id}' standby support: {_supportStandby}");
+                _logger.LogDebug($"Standby support: {_supportStandby}");
 
                 // Cooldown 
                 _cooldownDelay = _configs.Get(Id, "Cooldown Delay").ToDouble(double.NaN);
@@ -80,16 +81,33 @@ namespace IngameScript
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return 1;
                 }
+                _logger.LogDebug($"Cooldown Delay = {_cooldownDelay}");
 
                 // Subsystems
-                string props = _configs.Get(Id, "Subsystems").ToString();
-                if (props == "")
+                string[] subsystems = _configs.Get(Id, "Subsystems").ToString().Split('\n');
+                if (subsystems.Length == 0)
                 {
                     _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Subsystems");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return 1;
                 }
+                _logger.LogDebug($"Possible subsystems: {subsystems.Length}");
 
+                Subsystem subsys;
+                foreach (var item in subsystems.Select((value, i) => new { i, value }))
+                {
+                    if (Subsystem.TryParse(item.value, out subsys))
+                    {
+                        _logger.LogDebug($"Found subsystem '{subsys.Name}'");
+                        _subsystems.Add(subsys);
+                    }
+                    else
+                    {
+                        _logger.LogError($"Coudln't parse subsystem {item.i + 1}");
+                        _errsMngr.AddSubsystemParseError(Id, item.i);
+                    }
+                }
+                _logger.LogDebug($"Actual subsystems: {_subsystems.Count}");
 
                 IsReady = true;
                 return 0;
@@ -129,17 +147,40 @@ namespace IngameScript
 
             public bool? GetProperty(string propertyName)
             {
-                return null;
+                if (string.IsNullOrEmpty(propertyName))
+                    return null;
+
+                var subsys = _subsystems.Find(s => s.Name == propertyName);
+                if (subsys == default(Subsystem))
+                    return null;
+
+                return subsys.Enabled;
             }
 
             public int ToggleProperty(string propertyName)
             {
-                return 100;
+                if (string.IsNullOrEmpty(propertyName))
+                    return 1;
+
+                var subsys = _subsystems.Find(s => s.Name == propertyName);
+                if (subsys == default(Subsystem))
+                    return 2;
+
+                subsys.Enabled = !subsys.Enabled;
+                return 0;
             }
 
             public int SetProperty(string propertyName, bool state)
             {
-                return 100;
+                if (string.IsNullOrEmpty(propertyName))
+                    return 1;
+
+                var subsys = _subsystems.Find(s => s.Name == propertyName);
+                if (subsys == default(Subsystem))
+                    return 2;
+
+                subsys.Enabled = state;
+                return 0;
             }
         }
     }

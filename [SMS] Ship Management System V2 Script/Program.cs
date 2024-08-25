@@ -120,7 +120,6 @@ namespace IngameScript
                     continue;
                 }
 
-
                 string subtype = PBConfigs.Get(moduleId, "Subtype").ToString();
                 if (subtype == "")
                 {

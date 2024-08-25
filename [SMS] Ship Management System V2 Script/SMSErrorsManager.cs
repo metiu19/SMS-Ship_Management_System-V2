@@ -55,6 +55,9 @@ namespace IngameScript
 
             public void AddTagBlocksNotFoundError(string tag) =>
                 RegisterError($"[ERR_SMS_TAG_BLK_404] Couldn't find any block or group with given tag '{tag}'");
+
+            public void AddSubsystemParseError(string moduleId, int subsysIndex) =>
+                RegisterError($"[ERR_SMS_SBS_PRS] Couldn't parse subsystem {subsysIndex} of module '{moduleId}'");
         }
     }
 }
