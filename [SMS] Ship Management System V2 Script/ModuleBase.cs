@@ -201,22 +201,57 @@ namespace IngameScript
 
             public int TryFixError()
             {
-                return 100;
+                if (State != ModuleStates.Error)
+                    return 1;
+
+                foreach (Subsystem subsystem in _subsystems)
+                {
+                    if (subsystem.State != subsystem.DefaultState)
+                        return 2;
+                }
+                return 0;
             }
 
             public int ToggleState()
             {
-                return 100;
+                if ((State & (ModuleStates.Offline | ModuleStates.Active)) == ModuleStates.None)
+                    return 1;
+
+                if ((State & ModuleStates.Active) != 0)
+                    State = ModuleStates.ShuttingDown;
+                else if (State == ModuleStates.Offline)
+                    State = ModuleStates.BootingUp;
+                return 0;
             }
 
-            public int SetState(bool state)
+            public int SetState(ModuleStates state)
             {
-                return 100;
+                if ((State & (ModuleStates.Offline | ModuleStates.Active)) == ModuleStates.None)
+                    return 1;
+
+                if (state == ModuleStates.Online)
+                {
+                    if (State != ModuleStates.Offline)
+                        return 2;
+                    State = ModuleStates.BootingUp;
+                }
+                else if (state == ModuleStates.Offline)
+                {
+                    if ((State & ModuleStates.Active) == ModuleStates.None)
+                        return 2;
+                    State = ModuleStates.ShuttingDown;
+                }
+
+                return 0;
             }
 
             public int Standby()
             {
-                return 100;
+                if ((State & ModuleStates.Active) == ModuleStates.None)
+                    return 1;
+
+                State = State == ModuleStates.Standby ? ModuleStates.Online : ModuleStates.Standby;
+                return 0;
             }
 
 
