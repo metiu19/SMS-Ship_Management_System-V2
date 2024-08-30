@@ -39,7 +39,7 @@ namespace IngameScript
 
             ModuleSubtype Subtype { get; }
 
-            ModuleState State { get; }
+            ModuleStates State { get; }
 
 
             int Init();
@@ -50,7 +50,7 @@ namespace IngameScript
 
             int ToggleState();
 
-            int SetState(bool state);
+            int SetState(ModuleStates state);
 
             int Standby();
 

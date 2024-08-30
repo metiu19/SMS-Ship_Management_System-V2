@@ -40,7 +40,7 @@ namespace IngameScript
             public bool IsReady { get; private set; } = false;
             public string Name { get; private set; }
             public ModuleSubtype Subtype { get; }
-            public ModuleState State { get; private set; }
+            public ModuleStates State { get; private set; }
 
 
 
@@ -62,18 +62,21 @@ namespace IngameScript
                 // Default State
                 _defaultState = _configs.Get(Id, "Default State").ToBoolean();
                 if (_defaultState)
-                    State = ModuleState.Online;
+                    State = ModuleStates.Online;
                 else
-                    State = ModuleState.Offline;
+                    State = ModuleStates.Offline;
                 _logger.LogDebug($"Default State = {State}");
+
 
                 // Custom Name
                 Name = _configs.Get(Id, "Name").ToString(Id);
                 _logger.LogDebug($"Name = '{Name}'");
 
+
                 // Standby
                 _supportStandby = _configs.Get(Id, "Standby").ToBoolean();
                 _logger.LogDebug($"Standby support: {_supportStandby}");
+
 
                 // Cooldown 
                 _cooldownDelay = _configs.Get(Id, "Cooldown Delay").ToDouble(double.NaN);
@@ -84,6 +87,7 @@ namespace IngameScript
                     return 1;
                 }
                 _logger.LogDebug($"Cooldown Delay = {_cooldownDelay}");
+
 
                 // Subsystems
                 string[] subsystems = _configs.Get(Id, "Subsystems").ToString().Split('\n');
@@ -225,7 +229,7 @@ namespace IngameScript
                 if (subsys == default(Subsystem))
                     return null;
 
-                return subsys.Enabled;
+                return subsys.State;
             }
 
             public int ToggleProperty(string propertyName)
@@ -237,7 +241,7 @@ namespace IngameScript
                 if (subsys == default(Subsystem))
                     return 2;
 
-                subsys.Enabled = !subsys.Enabled;
+                subsys.State = !subsys.State;
                 return 0;
             }
 
@@ -250,7 +254,7 @@ namespace IngameScript
                 if (subsys == default(Subsystem))
                     return 2;
 
-                subsys.Enabled = state;
+                subsys.State = state;
                 return 0;
             }
         }

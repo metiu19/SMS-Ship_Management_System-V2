@@ -20,18 +20,21 @@ using VRageMath;
 
 namespace IngameScript
 {
-    public enum ModuleState
+    [Flags]
+    public enum ModuleStates
     {
-        Offline,
-        BootingUp,
-        Online,
-        ShuttingDown,
-        Error,
-        Standby
+        None = 0,
+        Offline = 1,
+        BootingUp = 2,
+        Online = 4,
+        ShuttingDown = 8,
+        Error = 16,
+        Standby = 32,
+        Active = Online | Standby
     }
 
     public static class ModuleStateExtensions
     {
-        public static bool ToBool(this ModuleState state) => state == ModuleState.Online;
+        public static bool ToBool(this ModuleStates state) => state == ModuleStates.Online;
     }
 }

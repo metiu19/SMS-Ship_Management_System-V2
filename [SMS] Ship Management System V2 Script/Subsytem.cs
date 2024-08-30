@@ -28,7 +28,7 @@ namespace IngameScript
             public readonly bool DefaultState;
             public readonly float StartDelay;
             public readonly float StopDelay;
-            public bool Enabled;
+            public bool State;
 
 
             public Subsystem(string name, bool defualtState, float startDelay, float stopDelay)
@@ -37,8 +37,9 @@ namespace IngameScript
                 DefaultState = defualtState;
                 StartDelay = startDelay;
                 StopDelay = stopDelay;
-                Enabled = defualtState;
+                State = defualtState;
             }
+
 
 
             /// <summary>
