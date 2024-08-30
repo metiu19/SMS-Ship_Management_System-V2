@@ -45,7 +45,9 @@ namespace IngameScript
             // Init Logs Screen
             IMyTextSurfaceProvider logsLCD = GridTerminalSystem.GetBlockWithName("SMS Logs LCD") as IMyTextSurfaceProvider;
             Logger = new ScreenLogger(this, "Logs", logsLCD, 0);
+#if DEBUG
             Logger.Debug = true;
+#endif
             Logger.LogInfo("Script Init Starting");
 
             // Fill Groups & Blocks

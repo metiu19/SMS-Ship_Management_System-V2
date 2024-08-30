@@ -12,7 +12,7 @@ This scripts aims to improve realism by making possible to simulate block's subs
 1. Clone this repo with this command `git clone --recurse-submodules`
 2. If you can't/didn't use the previous command then pull the submodule code with this command: `git submodule update --init --recursive`
 4. Launch [Setup (run before opening solution).bat](Setup%20(run%20before%20opening%20solution).bat) and follow the instructions
-5. Select Release build
+5. Choose either Release build or Debug (Debug logs enabled)
 6. Build project `[SMS] Ship Management System V2 Script`
 
 ## How to update the submodule
