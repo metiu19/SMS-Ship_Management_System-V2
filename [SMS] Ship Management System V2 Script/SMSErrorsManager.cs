@@ -58,6 +58,12 @@ namespace IngameScript
 
             public void AddSubsystemParseError(string moduleId, int subsysIndex) =>
                 RegisterError($"[ERR_SMS_SBS_PRS] Couldn't parse subsystem {subsysIndex} of module '{moduleId}'");
+
+            public void AddSequenceStepParseError(string moduleId, string sequenceName, int stepIndex) =>
+                RegisterError($"[ERR_SMS_SQN_PRS] Couldn't parse {sequenceName} sequence step {stepIndex} of module '{moduleId}'");
+
+            public void AddSequenceStepInvalidError(string moduleId, string sequenceName, string stepName) =>
+                RegisterError($"[ERR_SMS_SQN_INV] Module '{moduleId}' doesn't have any subsystem named '{stepName}' requested by {sequenceName} sequence");
         }
     }
 }

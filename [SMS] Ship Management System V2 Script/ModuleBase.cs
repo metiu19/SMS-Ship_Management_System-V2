@@ -29,10 +29,12 @@ namespace IngameScript
             private readonly ScreenLogger _logger;
             private readonly MyIni _configs;
             private readonly IModuleType _type;
+            private readonly List<Subsystem> _subsystems = new List<Subsystem>();
+            private readonly List<SequenceStep> _startupSteps = new List<SequenceStep>();
+            private readonly List<SequenceStep> _shutdownSteps = new List<SequenceStep>();
             private bool _defaultState;
             private bool _supportStandby;
             private double _cooldownDelay;
-            private List<Subsystem> _subsystems = new List<Subsystem>();
 
             public string Id { get; }
             public bool IsReady { get; private set; } = false;
@@ -108,6 +110,75 @@ namespace IngameScript
                     }
                 }
                 _logger.LogDebug($"Actual subsystems: {_subsystems.Count}");
+
+
+                // Sequences
+                string[] steps;
+                SequenceStep step;
+
+                // Startup Sequence
+                steps = _configs.Get(Id, "Startup Sequence").ToString().Split('\n');
+                if (string.IsNullOrEmpty(steps[0]))
+                {
+                    _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Startup Sequence");
+                    _errsMngr.AddErrorDescription($"For module '{Id}'");
+                    return 1;
+                }
+                _logger.LogDebug($"Possible startup steps: {steps.Length}");
+
+                foreach (var item in steps.Select((value, i) => new { i, value }))
+                {
+                    if (!SequenceStep.TryParse(item.value, out step))
+                    {
+                        _logger.LogError($"Couldn't parse startup step {item.i + 1}");
+                        _errsMngr.AddSequenceStepParseError(Id, "Startup", item.i);
+                        continue;
+                    }
+
+                    if (_subsystems.Find(s => s.Name == step.Name) == default(Subsystem))
+                    {
+                        _logger.LogError($"Invalid step name '{step.Name}', no matching subsystem");
+                        _errsMngr.AddSequenceStepInvalidError(Id, "Startup", step.Name);
+                        continue;
+                    }
+
+                    _logger.LogDebug($"Found step '{step.Name}'");
+                    _startupSteps.Add(step);
+                }
+                _logger.LogDebug($"Actual startup steps: {_startupSteps.Count}");
+
+                // Shutdown Sequence
+                steps = _configs.Get(Id, "Shutdown Sequence").ToString().Split('\n');
+                if (string.IsNullOrEmpty(steps[0]))
+                {
+                    _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Shutdown Sequence");
+                    _errsMngr.AddErrorDescription($"For module '{Id}'");
+                    return 1;
+                }
+                _logger.LogDebug($"Possible shutdown steps: {steps.Length}");
+
+                foreach (var item in steps.Select((value, i) => new { i, value }))
+                {
+                    if (!SequenceStep.TryParse(item.value, out step))
+                    {
+                        _logger.LogError($"Couldn't parse startup step {item.i + 1}");
+                        _errsMngr.AddSequenceStepParseError(Id, "Shutdown", item.i);
+                        continue;
+                    }
+
+                    if (_subsystems.Find(s => s.Name == step.Name) == default(Subsystem))
+                    {
+                        _logger.LogError($"Invalid step name '{step.Name}', no matching subsystem");
+                        _errsMngr.AddSequenceStepInvalidError(Id, "Shutdown", step.Name);
+                        continue;
+                    }
+
+                    _logger.LogDebug($"Found step '{step.Name}'");
+                    _shutdownSteps.Add(step);
+                }
+                _logger.LogDebug($"Actual shutdown steps: {_shutdownSteps.Count}");
+
+
 
                 IsReady = true;
                 return 0;
