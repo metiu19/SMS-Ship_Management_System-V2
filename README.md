@@ -24,11 +24,11 @@ If a new version of the submodule will be required by this project then use the 
 # To-Do List
 
 ## First Relase
-- [ ] Streamline (As Much As Possible) and Manage INI Config
+- [x] Streamline (As Much As Possible) and Manage INI Config
 - [x] Add Block Tag support
 - [ ] Multi Tick System Init
-- [ ] Develop Property Management
-- [ ] Develop Parse and Action Management by Topic
+- [x] Develop Property Management
+- [x] Develop Parse and Action Management by Topic
 - [ ] Develop Storage Logger System
 
 ## UI Interface
