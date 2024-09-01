@@ -22,13 +22,13 @@ namespace IngameScript
 {
     partial class Program
     {
-        public struct Subsystem
+        public class Subsystem
         {
-            public readonly string Name;
-            public readonly bool DefaultState;
-            public readonly float StartDelay;
-            public readonly float StopDelay;
-            public bool State;
+            public string Name { get; }
+            public bool DefaultState { get; }
+            public float StartDelay { get; }
+            public float StopDelay { get; }
+            public bool State { get; set; }
 
 
             public Subsystem(string name, bool defualtState, float startDelay, float stopDelay)
@@ -74,24 +74,12 @@ namespace IngameScript
                 subsystem = new Subsystem(name, defState, upT, downT);
                 return true;
             }
-
-
-
-            public bool Equals(Subsystem s) => Name == s.Name;
-
-            public override bool Equals(object obj) => Name == ((obj as Subsystem?)?.Name ?? "");
-
-            public override int GetHashCode() => Name.GetHashCode();
-
-            public static bool operator ==(Subsystem a, Subsystem b) => a.Equals(b);
-
-            public static bool operator !=(Subsystem a, Subsystem b) => !a.Equals(b);
         }
 
-        public struct SequenceStep
+        public class SequenceStep
         {
             public string Name { get; }
-            public bool State { get; set; }
+            public bool State { get; }
 
             public SequenceStep(string name, bool state)
             {
@@ -124,18 +112,6 @@ namespace IngameScript
                 moduleAction = new SequenceStep(fields[0], state);
                 return true;
             }
-
-
-
-            public bool Equals(SequenceStep s) => Name == s.Name;
-
-            public override bool Equals(object obj) => Name == ((obj as Subsystem?)?.Name ?? "");
-
-            public override int GetHashCode() => Name.GetHashCode();
-
-            public static bool operator ==(SequenceStep a, SequenceStep b) => a.Equals(b);
-
-            public static bool operator !=(SequenceStep a, SequenceStep b) => !a.Equals(b);
         }
     }
 }

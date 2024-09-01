@@ -33,8 +33,6 @@ namespace IngameScript
         {
             string Id { get; }
 
-            bool IsReady { get; }
-
             string Name { get; }
 
             ModuleSubtype Subtype { get; }
@@ -42,11 +40,11 @@ namespace IngameScript
             ModuleStates State { get; }
 
 
-            int Init();
+            bool Init();
 
             bool CheckState();
 
-            int TryFixError();
+            int ResetErrorState();
 
             int ToggleState();
 
@@ -55,11 +53,11 @@ namespace IngameScript
             int Standby();
 
 
-            bool? GetProperty(string propertyName);
+            bool? GetSubsystemState(string subsystemName);
 
-            int ToggleProperty(string propertyName);
+            int ToggleSubsystemState(string subsystemName);
 
-            int SetProperty(string propertyName, bool state);
+            int SetSubsystemState(string subsystemName, bool state);
         }
     }
 }

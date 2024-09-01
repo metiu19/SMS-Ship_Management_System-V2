@@ -24,7 +24,7 @@ namespace IngameScript
     {
         public class ModuleFactory
         {
-            public static IModule CreateModule(Program program, string id, string terminalName, ModuleTypes? type, string subtypeString)
+            public static IModule CreateModule(Program program, string id, string terminalName, ModuleType type, string subtypeString)
             {
                 IModuleType moduleType;
                 ModuleSubtype subtype;
@@ -38,30 +38,30 @@ namespace IngameScript
                 // Type
                 switch (type)
                 {
-                    case ModuleTypes.Block:
+                    case ModuleType.Block:
                         program.Logger.LogInfo("Type: Terminal Block");
                         if (!TryCreateTypeBlock(program, id, terminalName, out moduleType))
                             return null;
                         break;
 
-                    case ModuleTypes.Group:
+                    case ModuleType.Group:
                         program.Logger.LogInfo("Type: Terminal Group");
                         if (!TryCreateTypeGroup(program, id, terminalName, out moduleType))
                             return null;
                         break;
 
-                    case ModuleTypes.Tag:
-                        var blockMachets = program.Blocks.Where(b => b.CustomName.Contains(terminalName)).ToList();
-                        if (blockMachets.Count() == 1)  // Block
+                    case ModuleType.Tag:
+                        var blockMatches = program.Blocks.Where(b => b.CustomName.Contains(terminalName)).ToList();
+                        if (blockMatches.Count() == 1)  // Block
                         {
                             program.Logger.LogInfo("Type: Terminal Block");
                             if (!TryCreateTypeBlock(program, id, terminalName, out moduleType))
                                 return null;
                         }
-                        else if (blockMachets.Count() > 1) // Blocks Group
+                        else if (blockMatches.Count() > 1) // Blocks Group
                         {
                             program.Logger.LogInfo("Type: SMS Group");
-                            moduleType = new ModuleTypeGroup(blockMachets);
+                            moduleType = new ModuleTypeGroup(blockMatches);
                         }
                         else if (program.Groups.Any(g => g.Name.Contains(terminalName)))  // Terminal Group
                         {

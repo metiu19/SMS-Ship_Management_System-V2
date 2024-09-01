@@ -30,7 +30,8 @@ namespace IngameScript
         ShuttingDown = 8,
         Error = 16,
         Standby = 32,
-        Active = Online | Standby
+        Active = Online | Standby,
+        Transition = BootingUp | ShuttingDown
     }
 
     public static class ModuleStateExtensions

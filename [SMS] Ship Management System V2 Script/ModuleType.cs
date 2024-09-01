@@ -22,7 +22,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public enum ModuleTypes
+        public enum ModuleType
         {
             Block,
             Group,
