@@ -38,6 +38,9 @@ namespace IngameScript
             public SMSErrorsManager(Program program, IMyTextSurfaceProvider provider, int index = 0) : base(program, provider, index) { }
 
 
+            public void AddInvalidModuleIdError(string moduleId) =>
+                RegisterError($"[ERR_SMS_ID_INV] Invalid module id '{moduleId}'");
+
             public void AddGroupNoSupportedError(string group) =>
                 RegisterError($"[ERR_SMS_GRP_NSUP] Group '{group}' doesn't contain any supported blocks");
 

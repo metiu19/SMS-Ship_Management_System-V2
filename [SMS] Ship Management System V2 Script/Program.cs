@@ -103,6 +103,12 @@ namespace IngameScript
             foreach (string moduleId in sections)
             {
                 Logger.LogInfo($"Found possible module '{moduleId}'");
+                if (moduleId.Contains(' '))
+                {
+                    Logger.LogError("Invalid module id");
+                    ErrsMngr.AddInvalidModuleIdError(moduleId);
+                    continue;
+                }
 
                 string tName = PBConfigs.Get(moduleId, "Terminal Name").ToString();
                 string tGroup = PBConfigs.Get(moduleId, "Terminal Group").ToString();
