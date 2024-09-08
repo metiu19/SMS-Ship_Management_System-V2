@@ -149,8 +149,9 @@ namespace IngameScript
                 if (module != null)
                     _modules.Add(module);
             }
-            ErrsMngr.PrintErrors();
             Logger.LogInfo($"Modules registered: {_modules.Count}/{sections.Count}");
+            if (ErrsMngr.PrintErrors())
+                return;
 
 
             // Registering Args Commands
