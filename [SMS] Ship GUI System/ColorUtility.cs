@@ -3,8 +3,6 @@ using VRageMath;
 
 namespace IngameScript
 {
-    partial class Program
-    {
         public static class ColorExtensions
         {
             public static bool TryGetColorFromString(this Color color, string colorString, out Color resultColor) // TODO: Ho cambiato idea meglio aggiungere all'inizio la dicitura di tipo es (RGBA o HEX)
@@ -16,7 +14,7 @@ namespace IngameScript
                 {
                     try
                     {
-                        color = new Color()
+                        resultColor = new Color()
                         {
                             R = byte.Parse(splitStringColor[0]),
                             G = byte.Parse(splitStringColor[1]),
@@ -27,12 +25,12 @@ namespace IngameScript
                     }
                     catch (Exception)
                     {
-                        color = new Color();
+                        resultColor = new Color();
                         return false;
                     }
                 }
 
-                color = new Color();
+                resultColor = new Color();
                 return false;
 
             }
