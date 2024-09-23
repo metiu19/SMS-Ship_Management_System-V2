@@ -24,7 +24,6 @@ namespace IngameScript
                     Name = PBConfigs.Get("settings", "Tag").ToString();
 
                 Color _color = new Color();
-
                 if (_color.TryGetColorFromString(PBConfigs.Get("settings", "BackgroundColor").ToString(), out _color))
                     BackgroundColor = _color;
 

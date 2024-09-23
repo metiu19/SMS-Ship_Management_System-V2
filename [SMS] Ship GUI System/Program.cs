@@ -27,8 +27,6 @@ namespace IngameScript
 #endif
             Logger.LogInfo("Script Init Starting");
 
-
-
             // Parse PB Custom Data
             Logger.LogInfo("Loading configs");
             MyIniParseResult iniParseRes;
@@ -50,9 +48,6 @@ namespace IngameScript
                 Logger.LogCritical($"Error too configure MyINI Config: {_errorMessage}");
                 throw new Exception($"Error too configure MyINI Config: {_errorMessage}"); //TODO Gestire exception
             }
-
-
-            Color _color = new Color();
         }
 
         public void Save()
