@@ -24,7 +24,7 @@ namespace IngameScript
     {
         public class ModuleFactory
         {
-            public  IModule CreateModule(Program program, string id, string terminalName, ModuleType type, string subtypeString)
+            public static IModule CreateModule(Program program, string id, string terminalName, ModuleType type, string subtypeString)
             {
                 IModuleType moduleType;
                 ModuleSubtype subtype;
@@ -110,7 +110,7 @@ namespace IngameScript
                 return null;
             }
 
-            private  bool TryCreateTypeBlock(Program program, string moduleId, string blockName, out IModuleType moduleType)
+            private static bool TryCreateTypeBlock(Program program, string moduleId, string blockName, out IModuleType moduleType)
             {
                 moduleType = null;
 
@@ -127,7 +127,7 @@ namespace IngameScript
                 return true;
             }
 
-            private  bool TryCreateTypeGroup(Program program, string moduleId, string groupName, out IModuleType moduleType)
+            private static bool TryCreateTypeGroup(Program program, string moduleId, string groupName, out IModuleType moduleType)
             {
                 moduleType = null;
 

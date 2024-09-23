@@ -34,8 +34,8 @@ namespace IngameScript
         Transition = BootingUp | ShuttingDown
     }
 
-    public  class ModuleStateExtensions
+    public static class ModuleStateExtensions
     {
-        public  bool ToBool(this ModuleStates state) => state == ModuleStates.Online;
+        public static bool ToBool(this ModuleStates state) => state == ModuleStates.Online;
     }
 }
