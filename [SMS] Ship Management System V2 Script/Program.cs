@@ -38,6 +38,9 @@ namespace IngameScript
         private readonly List<IModule> _modules = new List<IModule>();
         private readonly MyCommandLine _commandLine = new MyCommandLine();
         private readonly Dictionary<string, Action> _commands = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase);
+        private readonly string _broadcastTag;
+        private IMyBroadcastListener _broadcastListener;
+        private IMyUnicastListener _unicastListener;
         private bool _inited = false;
 
         public Program()
@@ -154,6 +157,14 @@ namespace IngameScript
                 return;
 
 
+            // Init IGC
+            _broadcastTag = PBConfigs.Get("SMS", "Broadcast Tag").ToString("SMS");
+            _broadcastListener = IGC.RegisterBroadcastListener(_broadcastTag);
+            _broadcastListener.SetMessageCallback("BROADCAST");
+
+            _unicastListener = IGC.UnicastListener;
+            _unicastListener.SetMessageCallback("UNICAST");
+
             // Registering Args Commands
             _commands.Add("module", HandleModuleCommands);
             _commands.Add("subsystem", HandleSubsystemCommands);
@@ -183,19 +194,26 @@ namespace IngameScript
 
             if ((updateSource & _argCall) > 0)
             {
-                if (_commandLine.TryParse(argument))
+                HandleCommands(argument);
+            }
+
+            if ((updateSource & UpdateType.IGC) > 0)
+            {
+                while (_broadcastListener.HasPendingMessage)
                 {
-                    Logger.LogDebug($"Executing command: '{argument}'");
+                    MyIGCMessage message = _broadcastListener.AcceptMessage();
+                    if (message.Tag != _broadcastTag)
+                        return;
 
-                    Action commandAction;
-                    string command = _commandLine.Argument(0);
+                    if (message.Data.ToString() == "Logic?")
+                        IGC.SendUnicastMessage(message.Source, "Discovery", "Logic!");
+                }
 
-                    if (command == null)
-                        Logger.LogWarning("No command specified");
-                    else if (_commands.TryGetValue(command, out commandAction))
-                        commandAction();
-                    else
-                        Logger.LogWarning($"Unknown command {command}");
+                while (_unicastListener.HasPendingMessage)
+                {
+                    MyIGCMessage message = _unicastListener.AcceptMessage();
+                    if (message.Tag == "Command")
+                        HandleCommands(message.Data.ToString());
                 }
             }
         }
@@ -224,6 +242,24 @@ namespace IngameScript
         }
 
         //Commands handling
+        private void HandleCommands(string commandString)
+        {
+            if (_commandLine.TryParse(commandString))
+            {
+                Logger.LogDebug($"Executing command: '{commandString}'");
+
+                Action commandAction;
+                string command = _commandLine.Argument(0);
+
+                if (command == null)
+                    Logger.LogWarning("No command specified");
+                else if (_commands.TryGetValue(command, out commandAction))
+                    commandAction();
+                else
+                    Logger.LogWarning($"Unknown command {command}");
+            }
+        }
+
         private void HandleModuleCommands()
         {
             Logger.LogDebug($"Module command");
