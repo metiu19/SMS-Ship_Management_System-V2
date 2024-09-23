@@ -1,0 +1,11 @@
+﻿R e a d m e
+-----------
+
+Exemple INI Config
+
+[settings]
+Connection_ID=52345424345
+Name o Tag=LCD_01
+Background Color=RGBA(255, 255, 255, 10)
+Text Color=RGBA(255, 255, 255, 10)
+Logs LCD=Logs LCD

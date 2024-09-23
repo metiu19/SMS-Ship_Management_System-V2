@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "[SMS] Ship Management Syste
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ScriptsUtils", "ScriptsUtils\ScriptsUtils.shproj", "{8A3CDCC5-4B55-4D87-A415-698A0E1FF06F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "[SMS] Ship GUI System Script", "[SMS] Ship GUI System\[SMS] Ship GUI System Script.csproj", "{8D0CC8C3-94A8-4E4E-AEBE-0EE3D35F1D73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -17,6 +19,10 @@ Global
 		{F3B31EF3-1975-4667-9EEF-5E502C61F27A}.Debug|x64.Build.0 = Debug|x64
 		{F3B31EF3-1975-4667-9EEF-5E502C61F27A}.Release|x64.ActiveCfg = Release|x64
 		{F3B31EF3-1975-4667-9EEF-5E502C61F27A}.Release|x64.Build.0 = Release|x64
+		{8D0CC8C3-94A8-4E4E-AEBE-0EE3D35F1D73}.Debug|x64.ActiveCfg = Debug|x64
+		{8D0CC8C3-94A8-4E4E-AEBE-0EE3D35F1D73}.Debug|x64.Build.0 = Debug|x64
+		{8D0CC8C3-94A8-4E4E-AEBE-0EE3D35F1D73}.Release|x64.ActiveCfg = Release|x64
+		{8D0CC8C3-94A8-4E4E-AEBE-0EE3D35F1D73}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -26,6 +32,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		ScriptsUtils\ScriptsUtils.projitems*{8a3cdcc5-4b55-4d87-a415-698a0e1ff06f}*SharedItemsImports = 13
+		ScriptsUtils\ScriptsUtils.projitems*{8d0cc8c3-94a8-4e4e-aebe-0ee3d35f1d73}*SharedItemsImports = 5
 		ScriptsUtils\ScriptsUtils.projitems*{f3b31ef3-1975-4667-9eef-5e502c61f27a}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

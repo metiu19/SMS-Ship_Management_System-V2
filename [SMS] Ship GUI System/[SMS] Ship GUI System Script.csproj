@@ -25,7 +25,6 @@
       <None Remove="Instructions.readme" />
       <AdditionalFiles Include="Instructions.readme" />
     </ItemGroup>
-
-    <Import Project="..\SE-Scripts-Utils\ScriptsUtils.projitems" Label="Shared" />
+    <Import Project="..\ScriptsUtils\ScriptsUtils.projitems" Label="Shared" />
 
 </Project>
