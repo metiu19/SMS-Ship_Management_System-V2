@@ -27,7 +27,7 @@ namespace IngameScript
                 if (_color.TryGetColorFromString(PBConfigs.Get("settings", "BackgroundColor").ToString(), out _color))
                     BackgroundColor = _color;
 
-                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "TextColor").ToString(), out _color))
+                if (_color.TryGetColorFromRGBA(PBConfigs.Get("settings", "TextColor").ToString(), out _color))
                     TextColor = _color;
             }
 

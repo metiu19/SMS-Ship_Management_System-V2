@@ -1,38 +1,57 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using VRageMath;
 
 namespace IngameScript
 {
     public static class ColorExtensions
     {
-        public static bool TryGetColorFromString(this Color color, string colorString, out Color resultColor) // TODO: Ho cambiato idea meglio aggiungere all'inizio la dicitura di tipo es (RGBA o HEX)
+        /// <summary>
+        /// Attempts to convert a string representing a color in RGBA or HEX(ARGB) format to a Color object.
+        /// </summary>
+        /// <param name="stringColor"> 
+        /// Text with the color to convert
+        /// Accepted formats:
+        /// - RGBA(255,255,255,0)
+        /// - HEX(0080FF80)
+        /// </param>
+        /// <param name="resultColor"></param>
+        /// <returns></returns>
+        public static bool TryGetColorFromString(this Color color, string stringColor, out Color resultColor)
         {
-            char[] div = { ' ', ';', ',' };
-
-            string[] splitStringColor = colorString.Split(div);
-            if (splitStringColor.Length == 4)
+            byte _r, _g, _b, _a;
+            var matcRGBA = Regex.Match(stringColor, @"RGBA\((\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)");
+            var matchHEX = Regex.Match(stringColor, @"HEX\(([0-9A-Fa-f]{8})\)");
+            if (matcRGBA.Success)
             {
-                try
-                {
-                    resultColor = new Color()
-                    {
-                        R = byte.Parse(splitStringColor[0]),
-                        G = byte.Parse(splitStringColor[1]),
-                        B = byte.Parse(splitStringColor[2]),
-                        A = byte.Parse(splitStringColor[3]),
-                    };
-                    return true;
-                }
-                catch (Exception)
-                {
-                    resultColor = new Color();
-                    return false;
-                }
+                _r = byte.Parse(matcRGBA.Groups[1].Value);
+                _g = byte.Parse(matcRGBA.Groups[2].Value);
+                _b = byte.Parse(matcRGBA.Groups[3].Value);
+                _a = byte.Parse(matcRGBA.Groups[4].Value);
+            }
+     
+            else if (matchHEX.Success)
+            {
+                string _hexValue = matchHEX.Groups[1].Value;
+                _a = byte.Parse(_hexValue.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+                _r = byte.Parse(_hexValue.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                _g = byte.Parse(_hexValue.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                _b = byte.Parse(_hexValue.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+            }
+            else 
+            {
+                resultColor = new Color();
+                return false;
             }
 
-            resultColor = new Color();
-            return false;
-
+            resultColor = new Color()
+            {
+                R = _r,
+                G = _g,
+                B = _b,
+                A = _a,
+            };
+            return true;
         }
     }
 }
