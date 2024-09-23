@@ -5,9 +5,9 @@ namespace IngameScript
 {
     partial class Program
     {
-        internal class ColorUtility
+        public static class ColorExtensions
         {
-            public bool TryGetColorFromString(string colorString, out Color color) // TODO: Ho cambiato idea meglio aggiungere all'inizio la dicitura di tipo es (RGBA o HEX)
+            public static bool TryGetColorFromString(this Color color, string colorString, out Color resultColor) // TODO: Ho cambiato idea meglio aggiungere all'inizio la dicitura di tipo es (RGBA o HEX)
             {
                 char[] div = { ' ', ';', ',' };
 

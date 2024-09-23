@@ -23,13 +23,12 @@ namespace IngameScript
                 else
                     Name = PBConfigs.Get("settings", "Tag").ToString();
 
-                Color _color;
-                ColorUtility _colorUtility = new ColorUtility();
+                Color _color = new Color();
 
-                if (_colorUtility.TryGetColorFromString(PBConfigs.Get("settings", "BackgroundColor").ToString(), out _color))
+                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "BackgroundColor").ToString(), out _color))
                     BackgroundColor = _color;
 
-                if (_colorUtility.TryGetColorFromString(PBConfigs.Get("settings", "TextColor").ToString(), out _color))
+                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "TextColor").ToString(), out _color))
                     TextColor = _color;
             }
 
