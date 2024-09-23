@@ -1,22 +1,6 @@
-﻿using Sandbox.Game.EntityComponents;
-using Sandbox.ModAPI.Ingame;
-using Sandbox.ModAPI.Interfaces;
-using SpaceEngineers.Game.ModAPI.Ingame;
+﻿using Sandbox.ModAPI.Ingame;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using VRage;
-using VRage.Collections;
-using VRage.Game;
-using VRage.Game.Components;
-using VRage.Game.GUI.TextPanel;
-using VRage.Game.ModAPI.Ingame;
 using VRage.Game.ModAPI.Ingame.Utilities;
-using VRage.Game.ObjectBuilders.Definitions;
-using VRageMath;
 
 namespace IngameScript
 {
@@ -29,6 +13,8 @@ namespace IngameScript
         public ScreenLogger Logger { get; }
         private MyCommandLine _commandLine = new MyCommandLine();
         public MyIni PBConfigs { get; } = new MyIni();
+
+        public ConfigINI Configs = new ConfigINI();
 
         public Program()
         {
@@ -46,7 +32,7 @@ namespace IngameScript
             MyIniParseResult iniParseRes;
 
             if (string.IsNullOrEmpty(Me.CustomData))
-                Me.CustomData = ConfigINI.InitializeMyIniConfig();
+                Me.CustomData = Configs.InitializeMyIniConfig();
 
             if (!PBConfigs.TryParse(Me.CustomData, out iniParseRes))
             {
@@ -54,10 +40,10 @@ namespace IngameScript
                 throw new Exception("Could not parse PB Custom Data"); //TODO Gestire exception
             }
 
-            ConfigINI.InitializeConfigSettings(PBConfigs);
+            Configs.InitializeConfigSettings(PBConfigs);
 
             string _errorMessage;
-            if(!ConfigINI.checkMyIniConfig(out _errorMessage)) 
+            if (!Configs.checkMyIniConfig(out _errorMessage))
             {
                 Logger.LogCritical($"Error too configure MyINI Config: {_errorMessage}");
                 throw new Exception($"Error too configure MyINI Config: {_errorMessage}"); //TODO Gestire exception

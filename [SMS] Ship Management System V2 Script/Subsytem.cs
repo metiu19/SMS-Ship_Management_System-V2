@@ -48,7 +48,7 @@ namespace IngameScript
             /// <param name="subsysString">Input string to convert</param>
             /// <param name="subsystem">Objected parsed from <paramref name="subsysString"/></param>
             /// <returns><see cref="true"> if conversion succeded, false otherwise</returns>
-            public static bool TryParse(string subsysString, out Subsystem subsystem)
+            public  bool TryParse(string subsysString, out Subsystem subsystem)
             {
                 subsystem = default(Subsystem);
 
@@ -89,7 +89,7 @@ namespace IngameScript
 
 
 
-            public static bool TryParse(string actionString, out SequenceStep moduleAction)
+            public  bool TryParse(string actionString, out SequenceStep moduleAction)
             {
                 moduleAction = default(SequenceStep);
                 actionString = actionString.Trim();
