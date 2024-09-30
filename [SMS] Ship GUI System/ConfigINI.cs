@@ -7,37 +7,40 @@ namespace IngameScript
     {
         public  class ConfigINI
         {
-            public string ConnectionId { get; private set; }
-            public string Name { get; private set; }
-            public string Tag { get; private set; }
+            public string BroadcastTag { get; private set; } // ID for Broadcast Connectioon
+            public string LCDName { get; private set; }
+            public string LCDTag { get; private set; }
             public Color BackgroundColor { get; private set; }
             public Color TextColor { get; private set; }
 
 
             public void InitializeConfigSettings(MyIni PBConfigs)
             {
+                /* Broadcast Tag */
+                BroadcastTag = PBConfigs.Get("settings", "Broadcast Tag").ToString();
 
-                ConnectionId = PBConfigs.Get("settings", "Connection_ID").ToString();
-                if (PBConfigs.ContainsKey("settings", "Name"))
-                    Name = PBConfigs.Get("settings", "Name").ToString();
+                /* LCDName or LCDTag */
+                if (PBConfigs.ContainsKey("settings", "LCDName"))
+                    LCDName = PBConfigs.Get("settings", "LCD Name").ToString();
                 else
-                    Name = PBConfigs.Get("settings", "Tag").ToString();
+                    LCDTag = PBConfigs.Get("settings", "LCD Tag").ToString();
 
+                /* BackgroundColor */
                 Color _color = new Color();
-                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "BackgroundColor").ToString(), out _color))
+                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "Background Color").ToString(), out _color))
                     BackgroundColor = _color;
 
-                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "TextColor").ToString(), out _color))
+                /* TextColor */
+                if (_color.TryGetColorFromString(PBConfigs.Get("settings", "Text Color").ToString(), out _color))
                     TextColor = _color;
             }
 
-
-            public  string InitializeMyIniConfig()
+            public string InitializeMyIniConfig()
             {
                 MyIni configs = new MyIni();
-                configs.Set("settings", "Connection_ID", "52345424345");
-                configs.Set("settings", "Name", "LCD_01");
-                configs.Set("settings", "Tag", "LCD_01");
+                configs.Set("settings", "Broadcast Tag", "52345424345");
+                configs.Set("settings", "LCD Name", "LCD_01");
+                configs.Set("settings", "LCD Tag", "LCD_01");
                 configs.Set("settings", "Background Color", "RGBA(255, 255, 255, 10)");
                 configs.Set("settings", "Text Color", "RGBA(255, 0, 0, 10)");
                 return configs.ToString();
@@ -45,17 +48,27 @@ namespace IngameScript
 
             public  bool checkMyIniConfig(out string Error)
             {
-                if (string.IsNullOrEmpty(ConnectionId))
+                if (string.IsNullOrEmpty(BroadcastTag))
                 {
-                    Error = "Error Connection_ID not set, ex: Connection_ID:52345424345";
+                    Error = "Error Broadcast Tag not set, ex: Broadcast Tag:52345424345";
                     return false;
                 }
-                if (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Tag))
+                if (string.IsNullOrEmpty(LCDName) && string.IsNullOrEmpty(LCDTag))
                 {
-                    Error = "Error Name or Tag not set, ex: Name:LCD_01";
+                    Error = "Error LCD Name or LCD Tag not set, ex: LCD Name:LCD_01";
                     return false;
                 }
-                // TODO: Check Color
+                if (BackgroundColor == null)
+                {
+                    Error = "Error BackgroundColor not set, ex: Background Color:RGBA(255, 255, 255, 10)";
+                    return false;
+                }
+                if (TextColor == null)
+                {
+                    Error = "Error TextColor not set, ex: Text Color:RGBA(255, 255, 255, 10)";
+                    return false;
+                }
+
                 Error = "";
                 return true;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using VRageMath;
 
 namespace IngameScript
@@ -20,8 +19,8 @@ namespace IngameScript
         public static bool TryGetColorFromString(this Color color, string stringColor, out Color resultColor)
         {
             byte _r, _g, _b, _a;
-            var matcRGBA = Regex.Match(stringColor, @"RGBA\((\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)");
-            var matchHEX = Regex.Match(stringColor, @"HEX\(([0-9A-Fa-f]{8})\)");
+            var matcRGBA = System.Text.RegularExpressions.Regex.Match(stringColor, @"RGBA\((\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)");
+            var matchHEX = System.Text.RegularExpressions.Regex.Match(stringColor, @"HEX\(([0-9A-Fa-f]{8})\)");
             if (matcRGBA.Success)
             {
                 _r = byte.Parse(matcRGBA.Groups[1].Value);
