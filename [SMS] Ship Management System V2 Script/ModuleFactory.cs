@@ -30,7 +30,6 @@ namespace IngameScript
                 ModuleSubtype subtype;
                 if (!Enum.TryParse(subtypeString, out subtype))
                 {
-                    program.Logger.LogError("Subtype invalid");
                     program.ErrsMngr.AddModuleSubtypeInvalidError(id);
                     return null;
                 }
@@ -71,7 +70,6 @@ namespace IngameScript
                         }
                         else    // Not Found
                         {
-                            program.Logger.LogError("No block/s or group with tag found");
                             program.ErrsMngr.AddTagBlocksNotFoundError(terminalName);
                             program.ErrsMngr.AddErrorDescription($"Module '{id}'");
                             return null;
@@ -79,7 +77,6 @@ namespace IngameScript
                         break;
 
                     default:
-                        program.Logger.LogError("Type invalid");
                         program.ErrsMngr.AddModuleTypeInvalidError(id);
                         return null;
                 }
@@ -89,7 +86,6 @@ namespace IngameScript
                 MyIniParseResult res;
                 if (!moduleConfigs.TryParse(program.Me.CustomData, id, out res))
                 {
-                    program.Logger.LogError($"Could not parse module settings");
                     program.ErrsMngr.AddIniParseError(terminalName, res);
                     return null;
                 }
@@ -102,7 +98,6 @@ namespace IngameScript
                         return new ModuleBase(program, id, moduleType, subtype, moduleConfigs);
 
                     default:
-                        program.Logger.LogError($"Subtype '{subtype}' not implemented yet");
                         program.ErrsMngr.AddModuleSubtypeNotImplementedError(subtype);
                         break;
                 }
@@ -117,7 +112,6 @@ namespace IngameScript
                 IMyFunctionalBlock block = program.Blocks.FirstOrDefault(b => b.CustomName.Contains(blockName));
                 if (block == null || !block.IsSameConstructAs(program.Me))
                 {
-                    program.Logger.LogError($"Block '{blockName}' not found");
                     program.ErrsMngr.AddBlockNotFoundError(blockName);
                     program.ErrsMngr.AddErrorDescription($"Module '{moduleId}'");
                     return false;
@@ -134,7 +128,6 @@ namespace IngameScript
                 IMyBlockGroup group = program.Groups.Find(g => g.Name.Contains(groupName));
                 if (group == null)
                 {
-                    program.Logger.LogError($"Group '{groupName}' not found");
                     program.ErrsMngr.AddGroupNotFoundError(groupName);
                     program.ErrsMngr.AddErrorDescription($"Module '{moduleId}'");
                     return false;
@@ -143,7 +136,6 @@ namespace IngameScript
                 group.GetBlocksOfType(blocks, b => b.IsSameConstructAs(program.Me));
                 if (blocks.Count == 0)
                 {
-                    program.Logger.LogError($"Group '{groupName}' doesn't have any supported blocks");
                     program.ErrsMngr.AddGroupNoSupportedError(groupName);
                     program.ErrsMngr.AddErrorDescription($"Module '{moduleId}'");
                     return false;

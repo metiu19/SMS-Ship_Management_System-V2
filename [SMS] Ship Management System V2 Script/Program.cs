@@ -22,8 +22,8 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        public readonly string Title = "[SMS]";
-        public readonly string Version = "V2.0.0";
+        const string Title = "[SMS]";
+        const string Version = "V2.0.0";
 
         public List<IMyBlockGroup> Groups { get; } = new List<IMyBlockGroup>();
         public HashSet<IMyFunctionalBlock> Blocks { get; } = new HashSet<IMyFunctionalBlock>();
@@ -45,17 +45,18 @@ namespace IngameScript
 
         public Program()
         {
-            // Init Errors Manager
-            ErrsMngr = new SMSErrorsManager(this);
-
-
             // Init Logs Screen
             IMyTextSurfaceProvider logsLCD = GridTerminalSystem.GetBlockWithName("SMS Logs LCD") as IMyTextSurfaceProvider;
-            Logger = new ScreenLogger(this, "Logs", logsLCD, 0);
+            Logger = new ScreenLogger(Title, Version, "Logs", logsLCD, 0);
 #if DEBUG
             Logger.Debug = true;
 #endif
             Logger.LogInfo("Script Init Starting");
+
+
+            // Init Errors Manager
+            Logger.LogDebug("Init Errors Manager");
+            ErrsMngr = new SMSErrorsManager(Logger);
 
 
             // Fill Groups & Blocks
@@ -80,11 +81,7 @@ namespace IngameScript
             Logger.LogInfo("Loading configs");
             MyIniParseResult iniParseRes;
             if (!PBConfigs.TryParse(Me.CustomData, out iniParseRes))
-            {
-                Logger.LogCritical("Could not parse PB Custom Data");
-                ErrsMngr.AddIniParseError(Me.CustomName, iniParseRes);
-                ErrsMngr.PrintErrorsAndThrowException("Could not parse PB Custom Data");
-            }
+                ErrsMngr.AddIniParseError(Me.CustomName, iniParseRes, ErrorsType.Critical);
 
 
             // Check for missing sections
@@ -92,12 +89,8 @@ namespace IngameScript
             PBConfigs.GetSections(sections);
             List<string> missingSections = _requiredSections.Except(sections).ToList();
             if (missingSections.Count() != 0)
-            {
-                Logger.LogCritical("Missing required section/s check errors screen");
-                ErrsMngr.AddConfigMissingError("Missing required section/s in PB Custom Data");
-                missingSections.ForEach(ms => ErrsMngr.AddIniMissingSection(Me.CustomName, ms));
-                ErrsMngr.PrintErrorsAndThrowException("Missing required section/s in configs");
-            }
+                ErrsMngr.AddIniMissingSection(Me.CustomName, missingSections.Aggregate((res, next) => $"{res} & {next}"), ErrorsType.Critical);
+
             sections.RemoveAll(s => new HashSet<string>(_requiredSections).Contains(s));
 
 
@@ -108,7 +101,6 @@ namespace IngameScript
                 Logger.LogInfo($"Found possible module '{moduleId}'");
                 if (moduleId.Contains(' '))
                 {
-                    Logger.LogError("Invalid module id");
                     ErrsMngr.AddInvalidModuleIdError(moduleId);
                     continue;
                 }
@@ -135,7 +127,6 @@ namespace IngameScript
                 }
                 else
                 {
-                    Logger.LogError("Multiple or none types specified");
                     ErrsMngr.AddModuleTypeInvalidError(moduleId);
                     continue;
                 }
@@ -143,7 +134,6 @@ namespace IngameScript
                 string subtype = PBConfigs.Get(moduleId, "Subtype").ToString();
                 if (subtype == "")
                 {
-                    Logger.LogError("Subtype not found");
                     ErrsMngr.AddIniMissingKey(Me.CustomName, moduleId, "Subtype");
                     continue;
                 }
@@ -153,11 +143,10 @@ namespace IngameScript
                     _modules.Add(module);
             }
             Logger.LogInfo($"Modules registered: {_modules.Count}/{sections.Count}");
-            if (ErrsMngr.PrintErrors())
-                return;
 
 
             // Init IGC
+            Logger.LogDebug("Registering IGC Listeners");
             _broadcastTag = PBConfigs.Get("SMS", "Broadcast Tag").ToString("SMS");
             _broadcastListener = IGC.RegisterBroadcastListener(_broadcastTag);
             _broadcastListener.SetMessageCallback("BROADCAST");
@@ -166,6 +155,7 @@ namespace IngameScript
             _unicastListener.SetMessageCallback("UNICAST");
 
             // Registering Args Commands
+            Logger.LogDebug("Assigning commands");
             _commands.Add("module", HandleModuleCommands);
             _commands.Add("subsystem", HandleSubsystemCommands);
             _commands.Add("check", CheckModules);
@@ -231,7 +221,6 @@ namespace IngameScript
 
             _modules.RemoveAll(m => badModules.Contains(m));
             Logger.LogInfo($"Functional modules: {_modules.Count}");
-            ErrsMngr.PrintErrors();
 
             _inited = true;
         }

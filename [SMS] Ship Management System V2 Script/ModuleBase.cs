@@ -93,7 +93,6 @@ namespace IngameScript
                 _cooldownDelay = _configs.Get(Id, "Cooldown Delay").ToDouble(double.NaN);
                 if (double.IsNaN(_cooldownDelay))
                 {
-                    _logger.LogError("Couldn't parse Cooldown Delay");
                     _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Cooldown Delay");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return false;
@@ -105,7 +104,6 @@ namespace IngameScript
                 string[] subsystems = _configs.Get(Id, "Subsystems").ToString().Split('\n');
                 if (subsystems[0] == "")
                 {
-                    _logger.LogError("Couldn't parse Subsystems");
                     _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Subsystems");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return false;
@@ -137,7 +135,6 @@ namespace IngameScript
                 steps = _configs.Get(Id, "Startup Sequence").ToString().Split('\n');
                 if (string.IsNullOrEmpty(steps[0]))
                 {
-                    _logger.LogError("Couldn't parse Startup Sequence");
                     _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Startup Sequence");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return false;
@@ -148,14 +145,12 @@ namespace IngameScript
                 {
                     if (!SequenceStep.TryParse(item.value, out step))
                     {
-                        _logger.LogError($"Couldn't parse startup step {item.i + 1}");
                         _errsMngr.AddSequenceStepParseError(Id, "Startup", item.i);
                         continue;
                     }
 
                     if (_subsystems.Find(s => s.Name == step.Name) == null)
                     {
-                        _logger.LogError($"Invalid step name '{step.Name}', no matching subsystem");
                         _errsMngr.AddSequenceStepInvalidError(Id, "Startup", step.Name);
                         continue;
                     }
@@ -169,7 +164,6 @@ namespace IngameScript
                 steps = _configs.Get(Id, "Shutdown Sequence").ToString().Split('\n');
                 if (string.IsNullOrEmpty(steps[0]))
                 {
-                    _logger.LogError("Couldn't parse Shutdown Sequence");
                     _errsMngr.AddIniMissingKey(_program.Me.CustomName, Id, "Shutdown Sequence");
                     _errsMngr.AddErrorDescription($"For module '{Id}'");
                     return false;
@@ -180,14 +174,12 @@ namespace IngameScript
                 {
                     if (!SequenceStep.TryParse(item.value, out step))
                     {
-                        _logger.LogError($"Couldn't parse startup step {item.i + 1}");
                         _errsMngr.AddSequenceStepParseError(Id, "Shutdown", item.i);
                         continue;
                     }
 
                     if (_subsystems.Find(s => s.Name == step.Name) == null)
                     {
-                        _logger.LogError($"Invalid step name '{step.Name}', no matching subsystem");
                         _errsMngr.AddSequenceStepInvalidError(Id, "Shutdown", step.Name);
                         continue;
                     }
